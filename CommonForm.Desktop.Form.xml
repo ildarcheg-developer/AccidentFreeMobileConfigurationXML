@@ -54,6 +54,11 @@
 		<Event name="OnCreateAtServer">OnCreateAtServer</Event>
 	</Events>
 	<ChildItems>
+		<Button name="TestPur" id="160">
+			<Type>UsualButton</Type>
+			<CommandName>Form.Command.TestPur</CommandName>
+			<ExtendedTooltip name="TestPurExtendedTooltip" id="161"/>
+		</Button>
 		<LabelField name="ErrorSubmit" id="120">
 			<DataPath>Error</DataPath>
 			<ReadOnly>true</ReadOnly>
@@ -954,6 +959,21 @@
 				</v8:item>
 			</ToolTip>
 			<Action>BackFromDetails</Action>
+		</Command>
+		<Command name="TestPur" id="2">
+			<Title>
+				<v8:item>
+					<v8:lang>en</v8:lang>
+					<v8:content>Test pur</v8:content>
+				</v8:item>
+			</Title>
+			<ToolTip>
+				<v8:item>
+					<v8:lang>en</v8:lang>
+					<v8:content>Test pur</v8:content>
+				</v8:item>
+			</ToolTip>
+			<Action>TestPur</Action>
 		</Command>
 	</Commands>
 </Form>
