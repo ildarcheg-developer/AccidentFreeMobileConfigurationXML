@@ -54,11 +54,6 @@
 		<Event name="OnCreateAtServer">OnCreateAtServer</Event>
 	</Events>
 	<ChildItems>
-		<Button name="TestPur" id="160">
-			<Type>UsualButton</Type>
-			<CommandName>Form.Command.TestPur</CommandName>
-			<ExtendedTooltip name="TestPurExtendedTooltip" id="161"/>
-		</Button>
 		<LabelField name="ErrorSubmit" id="120">
 			<DataPath>Error</DataPath>
 			<ReadOnly>true</ReadOnly>
