@@ -18,7 +18,6 @@
 			<v8:content>newL</v8:content>
 		</v8:item>
 	</Title>
-	<WindowOpeningMode>LockWholeInterface</WindowOpeningMode>
 	<AutoTitle>false</AutoTitle>
 	<CommandBarLocation>Top</CommandBarLocation>
 	<AutoCommandBar name="FormCommandBar" id="-1">
