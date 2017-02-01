@@ -19,3 +19,13 @@ Procedure InitializePurchases() Export
 	
 		
 EndProcedure
+
+Function GetPurchaseIDs() Export
+	
+	PurchaseIDs = New Array;
+	PurchaseIDs.Add("one_month_subscription");
+	PurchaseIDs.Add("one_year_subscription");
+	
+	Return PurchaseIDs;
+	
+EndFunction

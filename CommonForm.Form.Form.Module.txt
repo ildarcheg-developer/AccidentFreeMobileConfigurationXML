@@ -1,0 +1,177 @@
+﻿&AtClient
+Function EmptyList() Export
+	
+	PurchaseIDs = Store.GetPurchaseIDs();
+	AvailablePurchaseIDs = InAppPurchases.GetList(PurchaseIDs, False);
+
+	Return AvailablePurchaseIDs.Count() = 0;
+		
+EndFunction
+
+&AtClient
+Procedure UpdatePurchaseInformation(Command)
+	
+	// Получаем список идентификаторов покупок/подписок
+	PurchaseIDs = Store.GetPurchaseIDs();
+	// Обновляем информацию по списку идентификаторов
+	InAppPurchases.UpdatePurchaseInformation(PurchaseIDs);		
+	
+	Result = "Updated: " + CurrentDate();
+	
+EndProcedure
+
+&AtClient
+Procedure OnOpen(Cancel)
+	
+	If NOT InAppPurchases.PurchasesSupported() Then
+		
+		Message = New UserMessage();
+		Message.Text = " In-app purchases are not supported!";
+		Message.Message();
+		
+	EndIf;
+	
+EndProcedure
+
+&AtClient
+Procedure GetList(Command)
+	
+	If EmptyList() Then 
+		
+		Message = New UserMessage();
+		Message.Text = "Please update In-App purchases!";
+		Message.Message();
+		
+		Return;
+		
+	EndIf;
+	
+	Result = "In-App purchases:" + Chars.LF;
+	
+	// Получаем список идентификаторов покупок/подписок
+	PurchaseIDs = Store.GetPurchaseIDs();
+	
+	// Получаем описание доступных встроенных покупок
+	// в отличие от данных в СП, в массиве будут не InAppPurchaseService, а InAppPurchase
+	// Замечание. Обращение к Гуглоплею (через интернет) не происходит, так как список хранится локально на устройстве.
+	// Обновление происходит после вызова UpdatePurchaseInformation, а также после BeginPurchasing
+	AvailablePurchaseIDs = InAppPurchases.GetList(PurchaseIDs, False);
+	
+	For Each InAppPurchase In AvailablePurchaseIDs Do
+		
+		Result = Result + ?(Result = "", "", Chars.LF) + "Currency: " + InAppPurchase.Currency 
+			+ Chars.LF + "Description: " + InAppPurchase.Description 
+			+ Chars.LF + "ID: " + InAppPurchase.ID 
+			+ Chars.LF + "Price: " + InAppPurchase.Price 
+			+ Chars.LF + "Title: " + InAppPurchase.Title 
+			+ Chars.LF + "----";
+	
+	EndDo;
+
+EndProcedure
+
+&AtClient
+Procedure Purchased(Command)
+	
+	If EmptyList() Then 
+		
+		Message = New UserMessage();
+		Message.Text = "Please update In-App purchases!";
+		Message.Message();
+		
+		Return;
+		
+	EndIf;
+	
+	Result = "In-App purchase status:" + Chars.LF;
+	
+	PurchaseIDs = Store.GetPurchaseIDs();
+	AvailablePurchaseIDs = InAppPurchases.GetList(PurchaseIDs, False);
+	
+	For Each InAppPurchase In AvailablePurchaseIDs Do
+		
+		// Обращение к Гуглоплею (через интернет) не происходит, так как данные хранятся локально на устройстве. 
+		// Обновление происходит после вызова UpdatePurchaseInformation, а также после BeginPurchasing 
+		Result = Result + ?(Result = "", "", Chars.LF) + InAppPurchase.ID + InAppPurchases.Purchased(InAppPurchase) 
+			+ Chars.LF + "----";
+	
+	EndDo;
+	
+EndProcedure
+
+&AtClient
+Procedure BeginPurchasing1(Command)
+	
+	If EmptyList() Then 
+		
+		Message = New UserMessage();
+		Message.Text = "Please update In-App purchases!";
+		Message.Message();
+		
+		Return;
+		
+	EndIf;		
+	
+	Result = "BeginPurchasing (month): " + CurrentDate() + Chars.LF;
+	
+	PurchaseIDs = Store.GetPurchaseIDs();
+	NotifyDescription = New NotifyDescription("PurchasingEnd1", ThisForm);
+	// Для начала покупки нужно передать или ИД встроенной покупки
+	// или непосредственно InAppPurchase (а не InAppPurchaseService, как говорит СП).
+	// В даноном случае передаем ИД.
+	InAppPurchases.BeginPurchasing(NotifyDescription, PurchaseIDs[0]);
+	
+EndProcedure
+
+&AtClient
+Procedure BeginPurchasing2(Command)
+	
+	If EmptyList() Then 
+		
+		Message = New UserMessage();
+		Message.Text = "Please update In-App purchases!";
+		Message.Message();
+		
+		Return;
+		
+	EndIf;
+	
+	Result = "Begin purchasing (year): " + CurrentDate() + Chars.LF;
+	
+	PurchaseIDs = Store.GetPurchaseIDs();
+	AvailablePurchaseIDs = InAppPurchases.GetList(PurchaseIDs, False);
+	NotifyDescription = New NotifyDescription("PurchasingEnd2", ThisForm);
+	// Для начала покупки нужно передать или ИД встроенной покупки
+	// или непосредственно InAppPurchase (а не InAppPurchaseService, как говорит СП).
+	// В даноном случае передаем InAppPurchase.
+	InAppPurchases.BeginPurchasing(NotifyDescription, AvailablePurchaseIDs[1]);
+
+EndProcedure
+
+&AtClient
+Procedure PurchasingEnd1(Purchase, Bought, Receipt, AdditionalInformation) Export
+	
+	// Если в BeginPurchasing передали ИД, то в параметре Purchase будет сидеть ИД (тип Строка) 
+	// Замечание. При тестировании всегда возвращалась строка с ИД
+	Result = Result + ?(Result = "", "", Chars.LF) + "ID: " + Purchase + " Type: " + TypeOf(Purchase) 
+	+ Chars.LF + "Bought: " + Bought 
+	+ Chars.LF + "Receipt: " + Receipt
+	+ Chars.LF + "Service: " + Receipt.Service
+	+ Chars.LF + "Additional information: " + AdditionalInformation
+	+ Chars.LF + "----";
+		
+EndProcedure
+
+&AtClient
+Procedure PurchasingEnd2(Purchase, Bought, Receipt, AdditionalInformation) Export
+	
+	// Если в BeginPurchasing передали InAppPurchase, то в параметре Purchase будет сидеть InAppPurchase
+	// Замечание. При тестировании всегда возвращалась строка с ИД
+	Result = Result + ?(Result = "", "", Chars.LF) + "ID: " + Purchase + " Type: " + TypeOf(Purchase)
+	+ Chars.LF + "Bought: " + Bought 
+	+ Chars.LF + "Receipt: " + Receipt
+	+ Chars.LF + "Service: " + Receipt.Service
+	+ Chars.LF + "Additional information: " + AdditionalInformation
+	+ Chars.LF + "----";
+		
+EndProcedure

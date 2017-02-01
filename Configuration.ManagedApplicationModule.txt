@@ -3,6 +3,7 @@ Procedure OnStart()
 	
 	ADs.SetUpADs();
 	
-	OpenForm("CommonForm.Desktop");
-	
+	//OpenForm("CommonForm.Desktop");
+	OpenForm("CommonForm.Form");
+
 EndProcedure
